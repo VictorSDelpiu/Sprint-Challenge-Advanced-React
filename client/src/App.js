@@ -1,55 +1,37 @@
-import React, {Component, useState} from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import axios from 'axios';
-import './App.css';
-import PlayerCard from './components/playerCard';
-import NavBar from './components/nav';
-import Graph from './components/graph';
+import React, {useState} from 'react';
 
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      players: [],
-    };
-  }
+import Container from '@material-ui/core/Container';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Switch from '@material-ui/core/Switch';
+import Typography from '@material-ui/core/Typography';
 
-  async componentDidMount() {
-    console.log("App: componentDidMount called!");
-      try {
-        const PlayerData = await axios.get(
-          "http://localhost:5000/api/players"
-        );
-        this.setState({
-          players: PlayerData.data,
-        })
-        
-      } catch(err){
-        console.log(err);
-      }
-  };
 
+import {ThemeProvider} from '@material-ui/core/styles';
+import CSSBaseline from '@material-ui/core/CssBaseline';
+import {useTheme} from '@material-ui/core/styles';
+
+import {lightTheme, darkTheme} from './themes';
+
+import CardList from './components/CardList';
+import { useDarkMode } from './hooks/useDarkMode';
+
+export default function App() {
+  const [isDarkTheme, setIsDarkTheme] = useDarkMode('isDarkMode', false);
+  const theme = useTheme();
   
-  
-  render() {
-    console.log(this.state.players);
-    return <header className="App-header">
-      <NavBar/>
-      <Route exact path="/" 
-      render ={() =>(
-      <PlayerCard
-      players = {this.state.players}
-      />)}/>
-
-    <Route path="/graph" 
-      render ={() =>(
-      <Graph
-      data = {this.state.players}
-      />)}/>
-     
-    </header>
-  }
+  return (
+    <ThemeProvider theme={isDarkTheme ? darkTheme : lightTheme}>
+      <CSSBaseline />
+   <Container maxWidth='md' style={{margin: '0 auto'}}>
+     <AppBar position='relative' color='default' style={{marginBottom: theme.spacing(6), transition: 'background-color 4s ease'}}>
+       <Toolbar  style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+        <Typography variant='h5' style={{transition: 'color 4s ease'}}>Player searches</Typography> <Typography variant='body1'>Use dark mode?<Switch color='primary' checked={isDarkTheme} onChange={() => {setIsDarkTheme(!isDarkTheme)}}/></Typography>
+       </Toolbar>
+     </AppBar>
+    <CardList/>
+   </Container>
+   </ThemeProvider>
+  )
 }
-
-export default App;
